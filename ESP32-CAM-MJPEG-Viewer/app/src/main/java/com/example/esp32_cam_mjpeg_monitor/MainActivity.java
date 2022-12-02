@@ -10,10 +10,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -26,59 +23,46 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class MainActivity extends Activity implements View.OnClickListener
-{
+public class MainActivity extends Activity implements View.OnClickListener {
 
     private static final String TAG = "MainActivity::";
 
     private HandlerThread stream_thread;
     private Handler stream_handler;
     private ImageView monitor;
-    private EditText ip_text;
 
     private final int ID_CONNECT = 200;
+
+    private final String StreamIP = "192.168.5.18";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
 
-        findViewById(R.id.connect).setOnClickListener(this);
         monitor = findViewById(R.id.monitor);
-        ip_text = findViewById(R.id.ip);
-
-        ip_text.setText("192.168.5.18");
 
         stream_thread = new HandlerThread("http");
         stream_thread.start();
         stream_handler = new HttpHandler(stream_thread.getLooper());
+
+        stream_handler.sendEmptyMessage(ID_CONNECT);
     }
 
     @Override
-    public void onClick(View v)
-    {
-        switch (v.getId())
-        {
-            case R.id.connect:
-                stream_handler.sendEmptyMessage(ID_CONNECT);
-                break;
-            default:
-                break;
-        }
+    public void onClick(View v) {
+        // Do Nothing
     }
 
-    private class HttpHandler extends Handler
-    {
-        public HttpHandler(Looper looper)
-        {
+    private class HttpHandler extends Handler {
+        public HttpHandler(Looper looper) {
             super(looper);
         }
 
         @Override
-        public void handleMessage(Message msg)
-        {
-            switch (msg.what)
-            {
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
                 case ID_CONNECT:
                     VideoStream();
                     break;
@@ -88,19 +72,16 @@ public class MainActivity extends Activity implements View.OnClickListener
         }
     }
 
-    private void VideoStream()
-    {
-        String stream_url = "http://" + ip_text.getText() + ":81/stream";
+    private void VideoStream() {
+        String stream_url = "http://" + StreamIP + ":81/stream";
 
         BufferedInputStream bis = null;
         FileOutputStream fos = null;
-        try
-        {
+        try {
 
             URL url = new URL(stream_url);
 
-            try
-            {
+            try {
                 HttpURLConnection huc = (HttpURLConnection) url.openConnection();
                 huc.setRequestMethod("GET");
                 huc.setConnectTimeout(1000 * 5);
@@ -108,8 +89,7 @@ public class MainActivity extends Activity implements View.OnClickListener
                 huc.setDoInput(true);
                 huc.connect();
 
-                if (huc.getResponseCode() == 200)
-                {
+                if (huc.getResponseCode() == 200) {
                     InputStream in = huc.getInputStream();
 
                     InputStreamReader isr = new InputStreamReader(in);
@@ -120,10 +100,8 @@ public class MainActivity extends Activity implements View.OnClickListener
                     int len;
                     byte[] buffer;
 
-                    while ((data = br.readLine()) != null)
-                    {
-                        if (data.contains("Content-Type:"))
-                        {
+                    while ((data = br.readLine()) != null) {
+                        if (data.contains("Content-Type:")) {
                             data = br.readLine();
 
                             len = Integer.parseInt(data.split(":")[1].trim());
@@ -132,8 +110,7 @@ public class MainActivity extends Activity implements View.OnClickListener
                             buffer = new byte[len];
 
                             int t = 0;
-                            while (t < len)
-                            {
+                            while (t < len) {
                                 t += bis.read(buffer, t, len - t);
                             }
 
@@ -141,11 +118,9 @@ public class MainActivity extends Activity implements View.OnClickListener
 
                             final Bitmap bitmap = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
 
-                            runOnUiThread(new Runnable()
-                            {
+                            runOnUiThread(new Runnable() {
                                 @Override
-                                public void run()
-                                {
+                                public void run() {
                                     monitor.setImageBitmap(bitmap);
                                 }
                             });
@@ -156,46 +131,36 @@ public class MainActivity extends Activity implements View.OnClickListener
                     }
                 }
 
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
-        } catch (MalformedURLException e)
-        {
+        } catch (MalformedURLException e) {
             e.printStackTrace();
-        } finally
-        {
-            try
-            {
-                if (bis != null)
-                {
+        } finally {
+            try {
+                if (bis != null) {
                     bis.close();
                 }
-                if (fos != null)
-                {
+                if (fos != null) {
                     fos.close();
                 }
 
-                stream_handler.sendEmptyMessageDelayed(ID_CONNECT,3000);
-            } catch (IOException e)
-            {
+                stream_handler.sendEmptyMessageDelayed(ID_CONNECT, 3000);
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
     }
 
-    private void Bytes2ImageFile(byte[] bytes, String fileName)
-    {
-        try
-        {
+    private void Bytes2ImageFile(byte[] bytes, String fileName) {
+        try {
             File file = new File(fileName);
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(bytes, 0, bytes.length);
             fos.flush();
             fos.close();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
