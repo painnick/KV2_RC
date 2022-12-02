@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.esp32_cam_mjpeg_monitor">
+    package="com.painnick.kv2camera">
 
     <application
         android:allowBackup="true"
@@ -13,7 +13,7 @@
         android:theme="@style/FullScreenTheme"
         tools:targetApi="m">
         <activity
-            android:name=".MainActivity"
+            android:name="com.painnick.kv2camera.MainActivity"
             android:screenOrientation="landscape"
             android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>

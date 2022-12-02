@@ -1,4 +1,4 @@
-package com.example.esp32_cam_mjpeg_monitor;
+package com.painnick.kv2camera;
 
 import android.content.Context;
 

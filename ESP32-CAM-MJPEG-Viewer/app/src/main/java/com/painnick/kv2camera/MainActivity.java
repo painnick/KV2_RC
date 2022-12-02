@@ -1,4 +1,4 @@
-package com.example.esp32_cam_mjpeg_monitor;
+package com.painnick.kv2camera;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -33,20 +33,19 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private final int ID_CONNECT = 200;
 
-    private final String StreamIP = "192.168.5.18";
+    private final String STREAM_IP = "192.168.5.18";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
 
         monitor = findViewById(R.id.monitor);
 
         stream_thread = new HandlerThread("http");
         stream_thread.start();
-        stream_handler = new HttpHandler(stream_thread.getLooper());
 
+        stream_handler = new HttpHandler(stream_thread.getLooper());
         stream_handler.sendEmptyMessage(ID_CONNECT);
     }
 
@@ -73,12 +72,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void VideoStream() {
-        String stream_url = "http://" + StreamIP + ":81/stream";
+        String stream_url = "http://" + STREAM_IP + ":81/stream";
 
         BufferedInputStream bis = null;
-        FileOutputStream fos = null;
         try {
-
             URL url = new URL(stream_url);
 
             try {
@@ -91,19 +88,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
                 if (huc.getResponseCode() == 200) {
                     InputStream in = huc.getInputStream();
-
                     InputStreamReader isr = new InputStreamReader(in);
                     BufferedReader br = new BufferedReader(isr);
 
                     String data;
-
                     int len;
                     byte[] buffer;
 
                     while ((data = br.readLine()) != null) {
                         if (data.contains("Content-Type:")) {
                             data = br.readLine();
-
                             len = Integer.parseInt(data.split(":")[1].trim());
 
                             bis = new BufferedInputStream(in);
@@ -115,7 +109,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
                             }
 
                             Bytes2ImageFile(buffer, getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
-
                             final Bitmap bitmap = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
 
                             runOnUiThread(new Runnable() {
@@ -124,13 +117,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
                                     monitor.setImageBitmap(bitmap);
                                 }
                             });
-
                         }
-
-
                     }
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -141,16 +130,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 if (bis != null) {
                     bis.close();
                 }
-                if (fos != null) {
-                    fos.close();
-                }
-
                 stream_handler.sendEmptyMessageDelayed(ID_CONNECT, 3000);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-
     }
 
     private void Bytes2ImageFile(byte[] bytes, String fileName) {
@@ -164,5 +148,4 @@ public class MainActivity extends Activity implements View.OnClickListener {
             e.printStackTrace();
         }
     }
-
 }
