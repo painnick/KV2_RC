@@ -1,0 +1,6 @@
+.idea/
+build/
+cmake-build-*/
+sdkconfig.old
+sdkconfig
+*.o
