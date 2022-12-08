@@ -2,6 +2,8 @@ set(srcs "main.c")
 
 set(requires "bluepad32")
 
+set(ENV{BLUEPAD32_ARDUINO} TRUE)
+
 # See: https://gitlab.com/ricardoquesada/bluepad32/-/issues/9
 if(DEFINED ENV{BLUEPAD32_ARDUINO})
     list(APPEND srcs "arduino_main.cpp")
