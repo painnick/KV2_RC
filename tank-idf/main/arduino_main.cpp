@@ -13,6 +13,7 @@ from "sdkconfig.defaults" with:
 CONFIG_BLUEPAD32_USB_CONSOLE_ENABLE=n
 
 https://gitlab.com/ricardoquesada/bluepad32/-/blob/main/docs/plat_arduino.md
+https://gitlab.com/ricardoquesada/bluepad32/-/blob/main/docs/supported_gamepads.md
 ****************************************************************************/
 
 #include "sdkconfig.h"
