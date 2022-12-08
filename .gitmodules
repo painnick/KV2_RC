@@ -1,3 +1,6 @@
 [submodule "tank-idf/components/arduino"]
 	path = tank-idf/components/arduino
 	url = https://github.com/espressif/arduino-esp32.git
+[submodule "tank-idf/components/ESP32Servo"]
+	path = tank-idf/components/ESP32Servo
+	url = https://github.com/madhephaestus/ESP32Servo.git
