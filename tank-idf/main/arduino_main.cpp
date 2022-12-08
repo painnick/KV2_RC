@@ -23,6 +23,9 @@ limitations under the License.
 
 #include <Arduino.h>
 #include <Bluepad32.h>
+#include <ESP32Servo.h>
+
+Servo servoTurret;
 
 //
 // README FIRST, README FIRST, README FIRST
