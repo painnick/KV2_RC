@@ -184,7 +184,7 @@ void onDisconnectedGamepad(GamepadPtr gp) {
 void setup() {
     Console.printf("Firmware: %s\n", BP32.firmwareVersion());
 
-    // Setup the Bluepad32 callbacks
+    // Set up the Bluepad32 callbacks
     BP32.setup(&onConnectedGamepad, &onDisconnectedGamepad);
 
     // "forgetBluetoothKeys()" should be called when the user performs
@@ -268,7 +268,7 @@ void loop() {
                 myGamepad->axisRY(),      // (-511 - 512) right Y axis
                 myGamepad->brake(),       // (0 - 1023): brake button
                 myGamepad->throttle(),    // (0 - 1023): throttle (AKA gas) button
-                myGamepad->miscButtons()  // bitmak of pressed "misc" buttons
+                myGamepad->miscButtons()  // bitmask of pressed "misc" buttons
             );
 
             // You can query the axis and other properties as well. See Gamepad.h
