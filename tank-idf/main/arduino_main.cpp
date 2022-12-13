@@ -34,6 +34,9 @@ https://gitlab.com/ricardoquesada/bluepad32/-/blob/main/docs/supported_gamepads.
 #include "Mp3Notify.h"
 #endif
 
+#include "TurretController.h"
+#include "TrackController.h"
+
 // These are all GPIO pins on the ESP32
 // Recommended pins include 2,4,12-19,21-23,25-27,32-33
 // for the ESP32-S2 the GPIO pins are 1-21,26,33-42
@@ -69,6 +72,10 @@ https://gitlab.com/ricardoquesada/bluepad32/-/blob/main/docs/supported_gamepads.
 #define TRACK_MOTOR_RESOLUTION 7
 
 Servo servoTurret;
+TurretController turretController(&servoTurret, PIN_TURRET_SERVO);
+
+TrackController leftTrack(PIN_TRACK_L1_MOTOR, PIN_TRACK_L2_MOTOR, CHANNEL_L1, CHANNEL_L2);
+TrackController rightTrack(PIN_TRACK_R1_MOTOR, PIN_TRACK_R2_MOTOR, CHANNEL_R1, CHANNEL_R2);
 
 #ifdef USE_SOUND
 HardwareSerial mySerial(2);  // 16, 17
@@ -76,14 +83,6 @@ DfMp3 dfmp3(mySerial);
 int volume = MAX_VOLUME;  // 0~30
 #endif
 
-const int center = 90;
-
-int bodyAngle = center;
-
-int angleStep = 5;
-int servoDelay = 15;
-
-int trackSpeed = pow(2, TRACK_MOTOR_RESOLUTION) - 1;  // Default Max
 bool isTurbo = false;
 
 bool circlePress = false;
@@ -91,49 +90,13 @@ bool trianglePress = false;
 bool squarePress = false;
 bool crossPress = false;
 
-uint setTrackSpeed(bool isTurbo) {
-#ifdef USE_TURNO
-    if (isTurbo) {
-        trackSpeed = 255;
-    } else {
-        trackSpeed = 128;
-    }
-    ESP_LOGD(MAIN_TAG, "trackSpeed %d", trackSpeed);
-#else
-    trackSpeed = 255;
-#endif
-
-    return trackSpeed;
-}
-
-void init() {
-    ESP_LOGI(MAIN_TAG, "Init.(Internal)");
-
-    bodyAngle = center;
-
-    servoTurret.attach(PIN_TURRET_SERVO, 500, 2400);
-
-    servoTurret.write(bodyAngle);
-
-    pinMode(PIN_MISSILE_LED, OUTPUT);
-
-    setTrackSpeed(isTurbo);
-
-    // #ifdef USE_SOUND
-    //   dfmp3.playMp3FolderTrack(3);
-    //   delay(1000);
-    //   dfmp3.playMp3FolderTrack(3);
-    // #endif
-}
-
 void reset() {
     ESP_LOGI(MAIN_TAG, "Reset");
-    bodyAngle = center;
 
-    servoTurret.write(bodyAngle);
+    turretController.init();
 
-    isTurbo = false;
-    setTrackSpeed(isTurbo);
+    leftTrack.stop();
+    rightTrack.stop();
 
 #ifdef USE_SOUND
     dfmp3.playMp3FolderTrack(3);

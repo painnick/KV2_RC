@@ -1,4 +1,10 @@
-set(srcs "main.c")
+set(srcs
+        "main.c"
+        "TrackController.h"
+        "TrackController.cpp"
+        "TurretController.h"
+        "TurretController.cpp"
+        )
 
 set(requires "bluepad32")
 
