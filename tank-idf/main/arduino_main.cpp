@@ -83,14 +83,7 @@ DfMp3 dfmp3(mySerial);
 int volume = MAX_VOLUME;  // 0~30
 #endif
 
-bool isTurbo = false;
-
-bool circlePress = false;
-bool trianglePress = false;
-bool squarePress = false;
-bool crossPress = false;
-
-void reset() {
+void onReset() {
     ESP_LOGI(MAIN_TAG, "Reset");
 
     turretController.init();
