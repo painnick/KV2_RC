@@ -1,5 +1,7 @@
 set(srcs
         "main.c"
+        "PadController.h"
+        "PadController.cpp"
         "TrackController.h"
         "TrackController.cpp"
         "TurretController.h"
