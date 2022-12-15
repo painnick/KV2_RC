@@ -10,31 +10,6 @@ GamepadPtr myGamepads[BP32_MAX_GAMEPADS];
 
 uni_gamepad_t lastPadStates[BP32_MAX_GAMEPADS];
 
-typedef struct {
-    // buttons
-    bool keyupA; // 0x01
-    bool keyupB; // 0x02
-    bool keyupX; // 0x04
-    bool keyupY; // 0x08
-    bool keyupL1; // 0x10
-    bool keyupR1; // 0x20
-    bool keyupL2; // 0x40
-    bool keyupR2; // 0x80
-    // dpad
-    bool keyupUp; // 0x01
-    bool keyupDown; // 0x02
-    bool keyupRight; // 0x04
-    bool keyupLeft; // 0x08
-    // misc
-    bool keyupSelect; // 0x02
-    bool keyupStart; // 0x04
-    //
-    bool changedAxisLx;
-    bool changedAxisLy;
-    bool changedAxisRx;
-    bool changedAxisRy;
-} PadEvents;
-
 // This callback gets called any time a new gamepad is connected.
 // Up to 4 gamepads can be connected at the same time.
 void onConnectedGamepad(GamepadPtr gp) {
@@ -91,8 +66,9 @@ PadController::PadController(Bluepad32* bp32) {
     this->bp32_ = bp32;
 }
 
-void PadController::setup() {
+void PadController::setup(const GamepadEventCallback e) {
     this->bp32_->setup(onConnectedGamepad, onDisconnectedGamepad);
+    this->onEvent = e;
 }
 
 void PadController::loop() {
@@ -156,55 +132,17 @@ void PadController::loop() {
             }
 
             if (lastPadStates[i].misc_buttons != myGamepad->miscButtons()) {
-                events.keyupSelect = ((lastPadStates[i].misc_buttons & 0x02) == 0) && ((myGamepad->miscButtons() & 0x02) > 0);
-                events.keyupStart = ((lastPadStates[i].misc_buttons & 0x04) == 0) && ((myGamepad->miscButtons() & 0x04) > 0);
+                events.keyupSelect =
+                    ((lastPadStates[i].misc_buttons & 0x02) == 0) && ((myGamepad->miscButtons() & 0x02) > 0);
+                events.keyupStart =
+                    ((lastPadStates[i].misc_buttons & 0x04) == 0) && ((myGamepad->miscButtons() & 0x04) > 0);
                 lastPadStates[i].misc_buttons = myGamepad->miscButtons();
                 changed = true;
             }
         }
 
         if (changed) {
-            if (events.keyupUp)
-                Console.println("Up");
-            if (events.keyupDown)
-                Console.println("Down");
-            if (events.keyupLeft)
-                Console.println("Left");
-            if (events.keyupRight)
-                Console.println("Right");
-
-            if (events.keyupA)
-                Console.println("A");
-            if (events.keyupB)
-                Console.println("B");
-            if (events.keyupX)
-                Console.println("X");
-            if (events.keyupY)
-                Console.println("Y");
-
-            if (events.keyupL1)
-                Console.println("L1");
-            if (events.keyupR1)
-                Console.println("R1");
-            if (events.keyupL2)
-                Console.println("L2");
-            if (events.keyupR2)
-                Console.println("R2");
-
-            if (events.keyupSelect)
-                Console.println("Select");
-            if (events.keyupStart)
-                Console.println("Start");
-
-            if (events.changedAxisLx)
-                Console.printf("Lx : %4d\n", myGamepad->axisX());
-            if (events.changedAxisLy)
-                Console.printf("Ly : %4d\n", myGamepad->axisY());
-            if (events.changedAxisRx)
-                Console.printf("Rx : %4d\n", myGamepad->axisRX());
-            if (events.changedAxisRy)
-                Console.printf("Ry : %4d\n", myGamepad->axisRY());
+            this->onEvent(i, events, myGamepad);
         }
     }
-
 }

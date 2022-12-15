@@ -35,8 +35,8 @@ https://gitlab.com/ricardoquesada/bluepad32/-/blob/main/docs/supported_gamepads.
 #endif
 
 #include "PadController.h"
-#include "TurretController.h"
 #include "TrackController.h"
+#include "TurretController.h"
 
 // These are all GPIO pins on the ESP32
 // Recommended pins include 2,4,12-19,21-23,25-27,32-33
@@ -99,9 +99,52 @@ void onReset() {
 #endif
 }
 
+void onPadEvent(int index, PadEvents events, GamepadPtr gamepad) {
+    if (events.keyupUp)
+        Console.println("Up");
+    if (events.keyupDown)
+        Console.println("Down");
+    if (events.keyupLeft)
+        Console.println("Left");
+    if (events.keyupRight)
+        Console.println("Right");
+
+    if (events.keyupA)
+        Console.println("A");
+    if (events.keyupB)
+        Console.println("B");
+    if (events.keyupX)
+        Console.println("X");
+    if (events.keyupY)
+        Console.println("Y");
+
+    if (events.keyupL1)
+        Console.println("L1");
+    if (events.keyupR1)
+        Console.println("R1");
+    if (events.keyupL2)
+        Console.println("L2");
+    if (events.keyupR2)
+        Console.println("R2");
+
+    if (events.keyupSelect)
+        Console.println("Select");
+    if (events.keyupStart)
+        Console.println("Start");
+
+    if (events.changedAxisLx)
+        Console.printf("Lx : %4d\n", gamepad->axisX());
+    if (events.changedAxisLy)
+        Console.printf("Ly : %4d\n", gamepad->axisY());
+    if (events.changedAxisRx)
+        Console.printf("Rx : %4d\n", gamepad->axisRX());
+    if (events.changedAxisRy)
+        Console.printf("Ry : %4d\n", gamepad->axisRY());
+}
+
 // Arduino setup function. Runs in CPU 1
 void setup() {
-    pad32.setup();
+    pad32.setup(onPadEvent);
 
     // "forgetBluetoothKeys()" should be called when the user performs
     // a "device factory reset", or similar.
