@@ -112,11 +112,14 @@ void onConnectedGamepad(GamepadPtr gp) {
                            properties.product_id);
             myGamepads[i] = gp;
             foundEmptySlot = true;
+
+            // TODO 연결 성공음 재생
             break;
         }
     }
     if (!foundEmptySlot) {
         Console.println("CALLBACK: Gamepad connected, but could not found empty slot");
+        // TODO 연결 실패음 재생
     }
 }
 
@@ -128,6 +131,7 @@ void onDisconnectedGamepad(GamepadPtr gp) {
             Console.printf("CALLBACK: Gamepad is disconnected from index=%d\n", i);
             myGamepads[i] = nullptr;
             foundGamepad = true;
+            // TODO 연결 해지음 재생
             break;
         }
     }
@@ -150,10 +154,14 @@ void setup() {
     // Forgetting Bluetooth keys prevents "paired" gamepads to reconnect.
     // But might also fix some connection / re-connection issues.
     BP32.forgetBluetoothKeys();
+
+    dfmp3.begin();
 }
 
 // Arduino loop function. Runs in CPU 1
 void loop() {
+    dfmp3.loop();
+
     // This call fetches all the gamepad info from the NINA (ESP32) module.
     // Just call this function in your main loop.
     // The gamepads pointer (the ones received in the callbacks) gets updated
@@ -188,6 +196,11 @@ void loop() {
                         break;
                 }
                 colorIdx++;
+            }
+
+            if (myGamepad->a()) {
+                dfmp3.playMp3FolderTrack(3);
+                Console.println("Sound!");
             }
 
             if (myGamepad->b()) {
