@@ -81,8 +81,8 @@ TrackController leftTrack(PIN_TRACK_L1_MOTOR, PIN_TRACK_L2_MOTOR, CHANNEL_L1, CH
 TrackController rightTrack(PIN_TRACK_R1_MOTOR, PIN_TRACK_R2_MOTOR, CHANNEL_R1, CHANNEL_R2);
 
 #ifdef USE_SOUND
-HardwareSerial mySerial(2);  // 16, 17
-DfMp3 dfmp3(mySerial);
+HardwareSerial mp3Serial(2);  // 16, 17
+DfMp3 dfmp3(mp3Serial);
 int volume = MAX_VOLUME;  // 0~30
 #endif
 
