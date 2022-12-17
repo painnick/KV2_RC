@@ -141,14 +141,25 @@ void onPadEvent(int index, PadEvents events, GamepadPtr gamepad) {
     if (events.keyupStart)
         Console.println("Start");
 
-    if (events.changedAxisLx)
-        Console.printf("Lx : %4d\n", gamepad->axisX());
-    if (events.changedAxisLy)
-        Console.printf("Ly : %4d\n", gamepad->axisY());
-    if (events.changedAxisRx)
-        Console.printf("Rx : %4d\n", gamepad->axisRX());
-    if (events.changedAxisRy)
-        Console.printf("Ry : %4d\n", gamepad->axisRY());
+    int32_t Ly = gamepad->axisY();
+    if (Ly > 50) {
+        leftTrack.backward();
+        Console.println("Left Track Backward");
+    } else if (Ly < -50) {
+        leftTrack.forward();
+        Console.println("Left Track Forward");
+    } else {
+        leftTrack.stop();
+    }
+
+    int32_t Ry = gamepad->axisRY();
+    if (Ry > 50) {
+        rightTrack.backward();
+    } else if (Ry < -50) {
+        rightTrack.forward();
+    } else {
+        rightTrack.stop();
+    }
 }
 
 // Arduino setup function. Runs in CPU 1
