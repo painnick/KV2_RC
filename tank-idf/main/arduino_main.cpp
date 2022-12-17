@@ -54,9 +54,9 @@ https://gitlab.com/ricardoquesada/bluepad32/-/blob/main/docs/supported_gamepads.
 
 #define PIN_MISSILE_LED 23  // Digital
 
-#define PIN_TRACK_L1_MOTOR 33  // PWM(Analog)
-#define PIN_TRACK_L2_MOTOR 32  // PWM(Analog)
-#define PIN_TRACK_R1_MOTOR 25  // PWM(Analog)
+#define PIN_TRACK_L1_MOTOR 19  // PWM(Analog)
+#define PIN_TRACK_L2_MOTOR 23  // PWM(Analog)
+#define PIN_TRACK_R1_MOTOR 18  // PWM(Analog)
 #define PIN_TRACK_R2_MOTOR 26  // PWM(Analog)
 
 #define CHANNEL_L1 14
