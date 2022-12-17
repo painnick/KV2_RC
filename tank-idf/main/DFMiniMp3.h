@@ -25,7 +25,7 @@ License along with DFMiniMp3.  If not, see
 -------------------------------------------------------------------------*/
 #pragma once
 
-#define USE_MH2024K16SS
+//#define USE_MH2024K16SS
 
 #include <stdint.h>
 #include <ArduinoConsole.h>
