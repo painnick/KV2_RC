@@ -28,6 +28,7 @@ License along with DFMiniMp3.  If not, see
 #define USE_MH2024K16SS
 
 #include <stdint.h>
+#include <ArduinoConsole.h>
 
 enum DfMp3_Error
 {
@@ -498,30 +499,19 @@ private:
         _lastSendSpace = sendSpaceNeeded;
 
 #ifdef _DEBUG
-        Serial.print("==>");
-        Serial.print(" (STR)");
-        Serial.print(packet.startCode, HEX);
-        Serial.print(" (VER)");
-        Serial.print(packet.version, HEX);
-        Serial.print(" (LEN)");
-        Serial.print(packet.length, HEX);
-        Serial.print(" (CMD)");
-        Serial.print(packet.command, HEX);
-        Serial.print(" (ACK)");
-        Serial.print(packet.requestAck, HEX);
-        Serial.print(" (PAR1)");
-        Serial.print(packet.hiByteArgument, HEX);
-        Serial.print(" (PAR2)");
-        Serial.print(packet.lowByteArgument, HEX);
+        Console.printf("==>");
+        Console.printf(" (STR) %02x", packet.startCode);
+        Console.printf(" (VER) %02x", packet.version);
+        Console.printf(" (LEN) %02x", packet.length);
+        Console.printf(" (CMD) %02x", packet.command);
+        Console.printf(" (ACK) %02x", packet.requestAck);
+        Console.printf(" (PAR1) %02x", packet.hiByteArgument);
+        Console.printf(" (PAR2) %02x", packet.lowByteArgument);
 #ifndef USE_MH2024K16SS
-        Serial.print(" (CHK1)");
-        Serial.print(packet.hiByteCheckSum, HEX);
-        Serial.print(" (CHK2)");
-        Serial.print(packet.lowByteCheckSum, HEX);
+        Console.printf(" (CHK1) %02x", packet.hiByteCheckSum);
+        Console.printf(" (CHK2) %02x", packet.lowByteCheckSum);
 #endif
-        // Serial.print(" (END)");
-        // Serial.print(packet.endCode, HEX);
-        Serial.println(".");
+        Console.printf(".\n");
 #endif
 
         _serial.write(reinterpret_cast<uint8_t*>(&packet), sizeof(packet));
@@ -579,12 +569,11 @@ private:
         }
 
 #ifdef _DEBUG
-        Serial.print(F("<== (CMD)"));
-        Serial.print(in.command, HEX);
-        Serial.print(F(" (PAR1)"));
-        Serial.print(in.hiByteArgument, HEX);
-        Serial.print(F(" (PAR2)"));
-        Serial.println(in.lowByteArgument, HEX);
+        Console.printf("<==");
+        Console.printf(" (CMD) %x02x", in.command);
+        Console.printf(" (PAR1) %x02x", in.hiByteArgument);
+        Console.printf(" (PAR2) %x02x", in.lowByteArgument);
+        Console.printf("\n");
 #endif
         *command = in.command;
         *argument = ((in.hiByteArgument << 8) | in.lowByteArgument);
