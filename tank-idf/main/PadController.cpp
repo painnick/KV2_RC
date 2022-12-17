@@ -83,7 +83,6 @@ void PadController::loop() {
         PadEvents events;
         memset(&events, 0, sizeof(PadEvents));
 
-        bool changed = false;
         if (myGamepad && myGamepad->isConnected()) {
             if (lastPadStates[i].dpad != myGamepad->dpad()) {
                 events.keyupUp = ((lastPadStates[i].dpad & 0x01) == 0) && ((myGamepad->dpad() & 0x01) > 0);
@@ -91,7 +90,6 @@ void PadController::loop() {
                 events.keyupRight = ((lastPadStates[i].dpad & 0x04) == 0) && ((myGamepad->dpad() & 0x04) > 0);
                 events.keyupLeft = ((lastPadStates[i].dpad & 0x08) == 0) && ((myGamepad->dpad() & 0x08) > 0);
                 lastPadStates[i].dpad = myGamepad->dpad();
-                changed = true;
             }
 
             if (lastPadStates[i].buttons != myGamepad->buttons()) {
@@ -104,31 +102,26 @@ void PadController::loop() {
                 events.keyupL2 = ((lastPadStates[i].buttons & 0x40) == 0) && ((myGamepad->buttons() & 0x40) > 0);
                 events.keyupR2 = ((lastPadStates[i].buttons & 0x80) == 0) && ((myGamepad->buttons() & 0x80) > 0);
                 lastPadStates[i].buttons = myGamepad->buttons();
-                changed = true;
             }
 
             if (lastPadStates[i].axis_x != myGamepad->axisX()) {
                 events.changedAxisLx = true;
                 lastPadStates[i].axis_x = myGamepad->axisX();
-                changed = true;
             }
 
             if (lastPadStates[i].axis_y != myGamepad->axisY()) {
                 events.changedAxisLy = true;
                 lastPadStates[i].axis_y = myGamepad->axisY();
-                changed = true;
             }
 
             if (lastPadStates[i].axis_rx != myGamepad->axisRX()) {
                 events.changedAxisRx = true;
                 lastPadStates[i].axis_rx = myGamepad->axisRX();
-                changed = true;
             }
 
             if (lastPadStates[i].axis_ry != myGamepad->axisRY()) {
                 events.changedAxisRy = true;
                 lastPadStates[i].axis_ry = myGamepad->axisRY();
-                changed = true;
             }
 
             if (lastPadStates[i].misc_buttons != myGamepad->miscButtons()) {
@@ -137,11 +130,8 @@ void PadController::loop() {
                 events.keyupStart =
                     ((lastPadStates[i].misc_buttons & 0x04) == 0) && ((myGamepad->miscButtons() & 0x04) > 0);
                 lastPadStates[i].misc_buttons = myGamepad->miscButtons();
-                changed = true;
             }
-        }
 
-        if (changed) {
             this->onEvent(i, events, myGamepad);
         }
     }

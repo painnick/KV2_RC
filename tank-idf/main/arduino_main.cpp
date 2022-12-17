@@ -109,14 +109,23 @@ void onPadEvent(int index, PadEvents events, GamepadPtr gamepad) {
     if (events.keyupRight)
         Console.println("Right");
 
-    if (events.keyupA)
-        Console.println("A");
-    if (events.keyupB)
-        Console.println("B");
-    if (events.keyupX)
-        Console.println("X");
-    if (events.keyupY)
-        Console.println("Y");
+    if (events.keyupA) {
+#ifdef USE_SOUND
+        dfmp3.playGlobalTrack(0);
+#endif
+    }
+    if (events.keyupB) {
+#ifdef USE_SOUND
+        dfmp3.playGlobalTrack(1);
+#endif
+    }
+    if (events.keyupX) {
+#ifdef USE_SOUND
+        dfmp3.playGlobalTrack(2);
+#endif
+    }
+    if (events.keyupY) {
+    }
 
     if (events.keyupL1)
         Console.println("L1");
@@ -153,12 +162,16 @@ void setup() {
     // But might also fix some connection / re-connection issues.
     // BP32.forgetBluetoothKeys();
 
+#ifdef USE_SOUND
     dfmp3.begin();
+#endif
 }
 
 // Arduino loop function. Runs in CPU 1
 void loop() {
+#ifdef USE_SOUND
     dfmp3.loop();
+#endif
 
     // This call fetches all the gamepad info from the NINA (ESP32) module.
     // Just call this function in your main loop.
