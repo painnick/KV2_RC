@@ -180,10 +180,6 @@ void setup() {
 
 // Arduino loop function. Runs in CPU 1
 void loop() {
-#ifdef USE_SOUND
-    dfmp3.loop();
-#endif
-
     // This call fetches all the gamepad info from the NINA (ESP32) module.
     // Just call this function in your main loop.
     // The gamepads pointer (the ones received in the callbacks) gets updated
