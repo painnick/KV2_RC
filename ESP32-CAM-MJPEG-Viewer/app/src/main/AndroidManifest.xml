@@ -10,6 +10,7 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/FullScreenTheme"
+        android:keepScreenOn="true"
         tools:targetApi="m">
         <activity
             android:name="com.painnick.kv2camera.MainActivity"
