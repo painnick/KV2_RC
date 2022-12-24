@@ -158,10 +158,13 @@ void onPadEvent(int index, PadEvents events, GamepadPtr gamepad) {
     if (events.keyupR2)
         Console.println("R2");
 
-    if (events.keyupSelect)
+    if (events.keyupSelect) {
         Console.println("Select");
-    if (events.keyupStart)
+    }
+    if (events.keyupStart) {
         Console.println("Start");
+        onReset();
+    }
 
     int32_t Ly = gamepad->axisY();
     if (Ly > 50) {
