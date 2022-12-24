@@ -61,6 +61,9 @@ https://gitlab.com/ricardoquesada/bluepad32/-/blob/main/docs/supported_gamepads.
 #define PIN_TRACK_R1_MOTOR 18  // PWM(Analog)
 #define PIN_TRACK_R2_MOTOR 26  // PWM(Analog)
 
+#define PIN_CANNON_LIGHT 32
+#define PIN_HEAD_LIGHT 25
+
 #define CHANNEL_L1 14
 #define CHANNEL_L2 15
 #define CHANNEL_R1 12
@@ -105,27 +108,34 @@ void onReset() {
 #endif
 }
 
+bool headLightOn = false;
+
 void onPadEvent(int index, PadEvents events, GamepadPtr gamepad) {
 
+    // Cannon Fire
     if (events.keyupA) {
+        digitalWrite(PIN_CANNON_LIGHT, HIGH);
+        delay(100);
+        digitalWrite(PIN_CANNON_LIGHT, LOW);
+
+        leftTrack.backward();
+        rightTrack.backward();
+        delay(50);
+
 #ifdef USE_SOUND
-        dfmp3.playGlobalTrack(0);
+        dfmp3.playGlobalTrack(2); // Cannon
 #endif
+
+        leftTrack.stop();
+        rightTrack.stop();
     }
     if (events.keyupB) {
 #ifdef USE_SOUND
-        dfmp3.playGlobalTrack(1);
+        dfmp3.playGlobalTrack(1); // Gatling
 #endif
-    }
-    if (events.keyupX) {
-#ifdef USE_SOUND
-        dfmp3.playGlobalTrack(2);
-#endif
-    }
-    if (events.keyupY) {
     }
 
-    // Cannon
+    // Cannon Up/Down
     if (events.keyupUp) {
         cannonController.turnUp();
     }
@@ -133,7 +143,7 @@ void onPadEvent(int index, PadEvents events, GamepadPtr gamepad) {
         cannonController.turnDown();
     }
 
-    // Turret
+    // Turret Left/Right
     if (events.keyupLeft) {
         turretController.turnLeft();
     }
@@ -141,30 +151,30 @@ void onPadEvent(int index, PadEvents events, GamepadPtr gamepad) {
         turretController.turnRight();
     }
 
-    if (events.keyupL1)
-        Console.println("L1");
-    if (events.keyupR1)
-        Console.println("R1");
-    if (events.keyupL2)
-        Console.println("L2");
-    if (events.keyupR2)
-        Console.println("R2");
-
+    // Head Light
     if (events.keyupSelect) {
-        Console.println("Select");
+        headLightOn = !headLightOn;
+        digitalWrite(PIN_HEAD_LIGHT, headLightOn ? HIGH : LOW);
     }
+
+    // Reset
     if (events.keyupStart) {
-        Console.println("Start");
         onReset();
+    }
+
+    // Volume
+    if (events.keyupL1) {
+        dfmp3.increaseVolume();
+    }
+    if (events.keyupL2) {
+        dfmp3.decreaseVolume();
     }
 
     int32_t Ly = gamepad->axisY();
     if (Ly > 50) {
         leftTrack.backward();
-        Console.println("Left Track Backward");
     } else if (Ly < -50) {
         leftTrack.forward();
-        Console.println("Left Track Forward");
     } else {
         leftTrack.stop();
     }
@@ -189,6 +199,9 @@ void setup() {
     // Forgetting Bluetooth keys prevents "paired" gamepads to reconnect.
     // But might also fix some connection / re-connection issues.
     // BP32.forgetBluetoothKeys();
+
+    pinMode(PIN_CANNON_LIGHT, OUTPUT);
+    pinMode(PIN_HEAD_LIGHT, OUTPUT);
 
 #ifdef USE_SOUND
     dfmp3.begin();
