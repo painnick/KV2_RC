@@ -106,14 +106,6 @@ void onReset() {
 }
 
 void onPadEvent(int index, PadEvents events, GamepadPtr gamepad) {
-    if (events.keyupUp)
-        Console.println("Up");
-    if (events.keyupDown)
-        Console.println("Down");
-    if (events.keyupLeft)
-        Console.println("Left");
-    if (events.keyupRight)
-        Console.println("Right");
 
     if (events.keyupA) {
 #ifdef USE_SOUND

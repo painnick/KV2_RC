@@ -31,6 +31,5 @@ int CannonController::turnDown(int angle) {
 }
 
 void CannonController::turn(int angle) {
-    log_i("Cannon angle:%d", angle);
     this->servo->write(angle + 90);
 }
