@@ -31,5 +31,6 @@ int TurretController::turnRight(int angle) {
 }
 
 void TurretController::turn(int angle) {
+    log_i("Turret angle:%d", angle);
     this->servo->write(angle + 90);
 }

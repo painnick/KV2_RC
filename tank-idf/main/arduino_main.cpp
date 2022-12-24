@@ -80,7 +80,7 @@ Servo servoTurret;
 TurretController turretController(&servoTurret, PIN_TURRET_SERVO);
 
 Servo servoCannon;
-CannonController cannonController(&servoCannon, PIN_CANNON_SERVO);
+CannonController cannonController(&servoCannon, PIN_CANNON_SERVO, 900, 2100);
 
 TrackController leftTrack(PIN_TRACK_L1_MOTOR, PIN_TRACK_L2_MOTOR, CHANNEL_L1, CHANNEL_L2);
 TrackController rightTrack(PIN_TRACK_R1_MOTOR, PIN_TRACK_R2_MOTOR, CHANNEL_R1, CHANNEL_R2);

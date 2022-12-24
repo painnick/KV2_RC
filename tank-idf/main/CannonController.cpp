@@ -19,17 +19,18 @@ void CannonController::init() {
 }
 
 int CannonController::turnUp(int angle) {
-    this->currentAngle = max(this->currentAngle + angle, this->maxUp);
+    this->currentAngle = min(this->currentAngle + angle, this->maxUp);
     this->turn(this->currentAngle);
     return this->currentAngle;
 }
 
 int CannonController::turnDown(int angle) {
-    this->currentAngle = min(this->currentAngle - angle, this->maxDown);
+    this->currentAngle = max(this->currentAngle - angle, this->maxDown);
     this->turn(this->currentAngle);
     return this->currentAngle;
 }
 
 void CannonController::turn(int angle) {
+    log_i("Cannon angle:%d", angle);
     this->servo->write(angle + 90);
 }
