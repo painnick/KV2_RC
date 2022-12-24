@@ -11,8 +11,8 @@ class CannonController {
    public:
     CannonController(Servo* servo, int pinNo, int minPulseWidth = 500, int maxPulseWidth = 2500);
     void init();
-    int turnUp(int angle = 2);
-    int turnDown(int angle = 2);
+    int turnUp(int angle = 5);
+    int turnDown(int angle = 5);
 
    protected:
     Servo* servo = NULL;
