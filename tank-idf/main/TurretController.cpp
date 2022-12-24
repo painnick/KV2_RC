@@ -25,7 +25,7 @@ int TurretController::turnLeft(int angle) {
 }
 
 int TurretController::turnRight(int angle) {
-    this->currentAngle = max(this->currentAngle + angle, this->maxRight);
+    this->currentAngle = min(this->currentAngle + angle, this->maxRight);
     this->turn(this->currentAngle);
     return this->currentAngle;
 }

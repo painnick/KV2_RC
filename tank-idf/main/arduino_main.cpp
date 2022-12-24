@@ -36,6 +36,7 @@ https://gitlab.com/ricardoquesada/bluepad32/-/blob/main/docs/supported_gamepads.
 
 #include "PadController.h"
 #include "TrackController.h"
+#include "CannonController.h"
 #include "TurretController.h"
 
 // These are all GPIO pins on the ESP32
@@ -50,6 +51,7 @@ https://gitlab.com/ricardoquesada/bluepad32/-/blob/main/docs/supported_gamepads.
 #define PIN_TX 17  // TX2
 #endif
 
+#define PIN_CANNON_SERVO 21  // PWM(Servo)
 #define PIN_TURRET_SERVO 22  // PWM(Servo)
 
 #define PIN_MISSILE_LED 23  // Digital
@@ -77,6 +79,9 @@ PadController pad32(&BP32);
 Servo servoTurret;
 TurretController turretController(&servoTurret, PIN_TURRET_SERVO);
 
+Servo servoCannon;
+CannonController cannonController(&servoCannon, PIN_CANNON_SERVO);
+
 TrackController leftTrack(PIN_TRACK_L1_MOTOR, PIN_TRACK_L2_MOTOR, CHANNEL_L1, CHANNEL_L2);
 TrackController rightTrack(PIN_TRACK_R1_MOTOR, PIN_TRACK_R2_MOTOR, CHANNEL_R1, CHANNEL_R2);
 
@@ -90,6 +95,7 @@ void onReset() {
     ESP_LOGI(MAIN_TAG, "Reset");
 
     turretController.init();
+    cannonController.init();
 
     leftTrack.stop();
     rightTrack.stop();
@@ -125,6 +131,22 @@ void onPadEvent(int index, PadEvents events, GamepadPtr gamepad) {
 #endif
     }
     if (events.keyupY) {
+    }
+
+    // Cannon
+    if (events.keyupUp) {
+        cannonController.turnUp();
+    }
+    if (events.keyupDown) {
+        cannonController.turnDown();
+    }
+
+    // Turret
+    if (events.keyupLeft) {
+        turretController.turnLeft();
+    }
+    if (events.keyupRight) {
+        turretController.turnRight();
     }
 
     if (events.keyupL1)

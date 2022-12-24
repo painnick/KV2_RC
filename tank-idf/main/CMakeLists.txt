@@ -6,6 +6,8 @@ set(srcs
         "TrackController.cpp"
         "TurretController.h"
         "TurretController.cpp"
+        "CannonController.h"
+        "CannonController.cpp"
         )
 
 set(requires "bluepad32")
