@@ -8,7 +8,7 @@
 // 0~255
 #define TRACK_MOTOR_RESOLUTION 8
 
-TrackController::TrackController(int pin1, int pin2, int ledc1, int ledc2) : ledc1(ledc1), ledc2(ledc2), speed(255) {
+TrackController::TrackController(int pin1, int pin2, int ledc1, int ledc2) : ledc1(ledc1), ledc2(ledc2), speed(256 - 1) {
     ledcSetup(ledc1, 1000, TRACK_MOTOR_RESOLUTION);
     ledcSetup(ledc2, 1000, TRACK_MOTOR_RESOLUTION);
 
@@ -33,4 +33,14 @@ void TrackController::stop() {
 
 void TrackController::setSpeed(int speed1) {
     speed = speed1;
+}
+
+int TrackController::speedUp(int step) {
+    speed = min(speed + step, 256 - 1);
+    return speed;
+}
+
+int TrackController::speedDown(int step) {
+    speed = max(speed - step, 196 - 1);
+    return speed;
 }

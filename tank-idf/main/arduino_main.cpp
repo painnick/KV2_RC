@@ -170,6 +170,16 @@ void onPadEvent(int index, PadEvents events, GamepadPtr gamepad) {
         dfmp3.decreaseVolume();
     }
 
+    // Speed
+    if (events.keyupR1) {
+        leftTrack.speedUp();
+        rightTrack.speedUp();
+    }
+    if (events.keyupR2) {
+        leftTrack.speedDown();
+        rightTrack.speedDown();
+    }
+
     int32_t Ly = gamepad->axisY();
     if (Ly > 50) {
         leftTrack.backward();

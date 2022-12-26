@@ -32,6 +32,8 @@ class TrackController {
     void backward();
     void stop();
     void setSpeed(int speed);
+    int speedUp(int step = 32);
+    int speedDown(int step = 32);
 
    protected:
     int ledc1, ledc2;
