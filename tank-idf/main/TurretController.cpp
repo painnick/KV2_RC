@@ -19,13 +19,13 @@ void TurretController::init() {
 }
 
 int TurretController::turnLeft(int angle) {
-    this->currentAngle = max(this->currentAngle - angle, this->maxLeft);
+    this->currentAngle = min(this->currentAngle + angle, this->maxRight);
     this->turn(this->currentAngle);
     return this->currentAngle;
 }
 
 int TurretController::turnRight(int angle) {
-    this->currentAngle = min(this->currentAngle + angle, this->maxRight);
+    this->currentAngle = max(this->currentAngle - angle, this->maxLeft);
     this->turn(this->currentAngle);
     return this->currentAngle;
 }
