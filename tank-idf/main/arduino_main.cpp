@@ -247,5 +247,7 @@ void loop() {
     // automatically.
     pad32.loop();
 
+    turretController.loop();
+
     delay(1);
 }
