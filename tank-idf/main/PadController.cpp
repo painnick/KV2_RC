@@ -10,6 +10,9 @@ GamepadPtr myGamepads[BP32_MAX_GAMEPADS];
 
 uni_gamepad_t lastPadStates[BP32_MAX_GAMEPADS];
 
+GamepadConnectedEventCallback onGamepadConnected;
+GamepadDisconnectedEventCallback onGamepadDisconnected;
+
 // This callback gets called any time a new gamepad is connected.
 // Up to 4 gamepads can be connected at the same time.
 void onConnectedGamepad(GamepadPtr gp) {
@@ -33,6 +36,8 @@ void onConnectedGamepad(GamepadPtr gp) {
         Console.println("CALLBACK: Gamepad connected, but could not found empty slot");
         // TODO 연결 실패음 재생
     }
+
+    onGamepadConnected(gp);
 }
 
 void onDisconnectedGamepad(GamepadPtr gp) {
@@ -60,15 +65,23 @@ void onDisconnectedGamepad(GamepadPtr gp) {
     if (!foundGamepad) {
         Console.println("CALLBACK: Gamepad disconnected, but not found in myGamepads");
     }
+
+    onGamepadDisconnected(gp);
 }
 
 PadController::PadController(Bluepad32* bp32) {
     this->bp32_ = bp32;
 }
 
-void PadController::setup(const GamepadEventCallback e) {
+void PadController::setup(
+    const GamepadEventCallback e,
+    const GamepadConnectedEventCallback onConnected,
+    const GamepadDisconnectedEventCallback onDisconnected) {
     this->bp32_->setup(onConnectedGamepad, onDisconnectedGamepad);
     this->onEvent = e;
+
+    onGamepadConnected = onConnected;
+    onGamepadDisconnected = onDisconnected;
 }
 
 void PadController::loop() {

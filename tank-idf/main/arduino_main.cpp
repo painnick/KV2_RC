@@ -77,6 +77,11 @@ https://gitlab.com/ricardoquesada/bluepad32/-/blob/main/docs/supported_gamepads.
 
 #define TRACK_MOTOR_RESOLUTION 7
 
+#define TRACK_WAIT 1
+#define TRACK_CANNON 2
+#define TRACK_GATLING 3
+#define TRACK_RESET 4
+
 PadController pad32(&BP32);
 
 Servo servoTurret;
@@ -104,7 +109,7 @@ void onReset() {
     rightTrack.stop();
 
 #ifdef USE_SOUND
-    dfmp3.playMp3FolderTrack(3);
+    dfmp3.playMp3FolderTrack(TRACK_RESET);
 #endif
 }
 
@@ -123,7 +128,7 @@ void onPadEvent(int index, PadEvents events, GamepadPtr gamepad) {
         delay(50);
 
 #ifdef USE_SOUND
-        dfmp3.playGlobalTrack(2); // Cannon
+        dfmp3.playMp3FolderTrack(TRACK_CANNON);
 #endif
 
         leftTrack.stop();
@@ -131,7 +136,7 @@ void onPadEvent(int index, PadEvents events, GamepadPtr gamepad) {
     }
     if (events.keyupB) {
 #ifdef USE_SOUND
-        dfmp3.playGlobalTrack(1); // Gatling
+        dfmp3.playMp3FolderTrack(TRACK_GATLING);
 #endif
     }
 
@@ -199,9 +204,21 @@ void onPadEvent(int index, PadEvents events, GamepadPtr gamepad) {
     }
 }
 
+void onPadConnected(GamepadPtr gp) {
+#ifdef USE_SOUND
+    dfmp3.playMp3FolderTrack(TRACK_RESET);
+#endif
+}
+
+void onPadDisonnected(GamepadPtr gp) {
+#ifdef USE_SOUND
+    dfmp3.loopGlobalTrack(4);
+#endif
+}
+
 // Arduino setup function. Runs in CPU 1
 void setup() {
-    pad32.setup(onPadEvent);
+    pad32.setup(onPadEvent, onPadConnected, onPadDisonnected);
 
     // "forgetBluetoothKeys()" should be called when the user performs
     // a "device factory reset", or similar.
@@ -215,6 +232,10 @@ void setup() {
 
 #ifdef USE_SOUND
     dfmp3.begin();
+
+    dfmp3.setVolume(volume);
+
+    dfmp3.loopGlobalTrack(4);
 #endif
 }
 
