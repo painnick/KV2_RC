@@ -70,7 +70,7 @@ https://gitlab.com/ricardoquesada/bluepad32/-/blob/main/docs/supported_gamepads.
 #define CHANNEL_R2 13
 
 #ifdef USE_SOUND
-#define MAX_VOLUME 18
+#define DEFAULT_VOLUME 18
 #endif
 
 #define STICK_THRESHOLD 20
@@ -96,7 +96,6 @@ TrackController rightTrack(PIN_TRACK_R1_MOTOR, PIN_TRACK_R2_MOTOR, CHANNEL_R1, C
 #ifdef USE_SOUND
 HardwareSerial mp3Serial(2);  // 16, 17
 DfMp3 dfmp3(mp3Serial);
-int volume = MAX_VOLUME;  // 0~30
 #endif
 
 void onReset() {
@@ -212,6 +211,8 @@ void onPadConnected(GamepadPtr gp) {
 
 void onPadDisonnected(GamepadPtr gp) {
 #ifdef USE_SOUND
+    dfmp3.setVolume(DEFAULT_VOLUME);
+
     dfmp3.loopGlobalTrack(4);
 #endif
 }
@@ -233,7 +234,7 @@ void setup() {
 #ifdef USE_SOUND
     dfmp3.begin();
 
-    dfmp3.setVolume(volume);
+    dfmp3.setVolume(DEFAULT_VOLUME);
 
     dfmp3.loopGlobalTrack(4);
 #endif
