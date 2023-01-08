@@ -125,7 +125,7 @@ void onPadEvent(int index, PadEvents events, GamepadPtr gamepad) {
 
         leftTrack.backward();
         rightTrack.backward();
-        delay(50);
+        delay(20);
 
 #ifdef USE_SOUND
         dfmp3.playMp3FolderTrack(TRACK_CANNON);
