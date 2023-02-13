@@ -8,7 +8,8 @@ android {
     defaultConfig {
         applicationId "com.example.esp32_cam_mjpeg_monitor"
         minSdkVersion 21
-        targetSdkVersion 29
+        //noinspection ExpiredTargetSdkVersion
+        targetSdkVersion 23
         versionCode 1
         versionName "1.0"
 
