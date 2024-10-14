@@ -246,5 +246,5 @@ void loop() {
     // automatically.
     pad32.loop();
 
-    delay(1);
+    dfmp3.loop();
 }
