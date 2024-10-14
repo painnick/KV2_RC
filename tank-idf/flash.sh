@@ -1,3 +1,3 @@
 #!/bin/bash
 source env.sh
-idf.py flash -p /dev/ttyACM0
+idf.py flash monitor -p /dev/ttyACM0
