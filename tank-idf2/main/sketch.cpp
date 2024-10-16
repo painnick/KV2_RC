@@ -20,8 +20,7 @@
 
 #include "./common.h"
 
-#include "./controllers/Mp3Notify.h"
-#include "./libs/DFMiniMp3.h"
+#include "./controllers/Mp3Controller.h"
 
 #include "./controllers/CannonController.h"
 #include "./controllers/PadController.h"
@@ -41,7 +40,6 @@ CannonController cannonController(&servoCannon, PIN_CANNON_SERVO, 900, 2100);
 TrackController leftTrack(PIN_TRACK_L1_MOTOR, PIN_TRACK_L2_MOTOR, CHANNEL_L1, CHANNEL_L2);
 TrackController rightTrack(PIN_TRACK_R1_MOTOR, PIN_TRACK_R2_MOTOR, CHANNEL_R1, CHANNEL_R2);
 
-DfMp3 dfmp3(Serial1, PIN_MP3_RX, PIN_MP3_TX);
 bool headLightOn = false;
 
 void onReset() {
@@ -150,81 +148,6 @@ void onPadDisonnected(GamepadPtr gp) {
     dfmp3.loopGlobalTrack(4);
 }
 
-void dumpGamepad(ControllerPtr ctl) {
-    Console.printf(
-        "idx=%d, dpad: 0x%02x, buttons: 0x%04x, axis L: %4d, %4d, axis R: %4d, %4d, brake: %4d, throttle: %4d, "
-        "misc: 0x%02x, gyro x:%6d y:%6d z:%6d, accel x:%6d y:%6d z:%6d\n",
-        ctl->index(),        // Controller Index
-        ctl->dpad(),         // D-pad
-        ctl->buttons(),      // bitmask of pressed buttons
-        ctl->axisX(),        // (-511 - 512) left X Axis
-        ctl->axisY(),        // (-511 - 512) left Y axis
-        ctl->axisRX(),       // (-511 - 512) right X axis
-        ctl->axisRY(),       // (-511 - 512) right Y axis
-        ctl->brake(),        // (0 - 1023): brake button
-        ctl->throttle(),     // (0 - 1023): throttle (AKA gas) button
-        ctl->miscButtons(),  // bitmask of pressed "misc" buttons
-        ctl->gyroX(),        // Gyro X
-        ctl->gyroY(),        // Gyro Y
-        ctl->gyroZ(),        // Gyro Z
-        ctl->accelX(),       // Accelerometer X
-        ctl->accelY(),       // Accelerometer Y
-        ctl->accelZ()        // Accelerometer Z
-    );
-}
-
-void processGamepad(ControllerPtr ctl) {
-    // There are different ways to query whether a button is pressed.
-    // By query each button individually:
-    //  a(), b(), x(), y(), l1(), etc...
-    if (ctl->a()) {
-        static int colorIdx = 0;
-        // Some gamepads like DS4 and DualSense support changing the color LED.
-        // It is possible to change it by calling:
-        switch (colorIdx % 3) {
-            case 0:
-                // Red
-                ctl->setColorLED(255, 0, 0);
-                break;
-            case 1:
-                // Green
-                ctl->setColorLED(0, 255, 0);
-                break;
-            case 2:
-                // Blue
-                ctl->setColorLED(0, 0, 255);
-                break;
-        }
-        colorIdx++;
-    }
-
-    if (ctl->b()) {
-        // Turn on the 4 LED. Each bit represents one LED.
-        static int led = 0;
-        led++;
-        // Some gamepads like the DS3, DualSense, Nintendo Wii, Nintendo Switch
-        // support changing the "Player LEDs": those 4 LEDs that usually indicate
-        // the "gamepad seat".
-        // It is possible to change them by calling:
-        ctl->setPlayerLEDs(led & 0x0f);
-    }
-
-    if (ctl->x()) {
-        // Some gamepads like DS3, DS4, DualSense, Switch, Xbox One S, Stadia support rumble.
-        // It is possible to set it by calling:
-        // Some controllers have two motors: "strong motor", "weak motor".
-        // It is possible to control them independently.
-        ctl->playDualRumble(0 /* delayedStartMs */, 250 /* durationMs */, 0x80 /* weakMagnitude */,
-                            0x40 /* strongMagnitude */);
-    }
-
-    // Another way to query controller data is by getting the buttons() function.
-    // See how the different "dump*" functions dump the Controller info.
-    dumpGamepad(ctl);
-
-    // See ArduinoController.h for all the available functions.
-}
-
 // Arduino setup function. Runs in CPU 1
 void setup() {
     Console.printf("Firmware: %s\n", BP32.firmwareVersion());
@@ -252,6 +175,12 @@ void setup() {
     // This service allows clients, like a mobile app, to setup and see the state of Bluepad32.
     // By default, it is disabled.
     BP32.enableBLEService(false);
+
+    setupSound();
+    delay(1000);
+
+    playOpening();
+    delay(4000);
 }
 
 // Arduino loop function. Runs in CPU 1.
