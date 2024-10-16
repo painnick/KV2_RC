@@ -51,7 +51,7 @@ void onReset() {
     leftTrack.stop();
     rightTrack.stop();
 
-    dfmp3.playMp3FolderTrack(TRACK_RESET);
+    playReset();
 }
 
 void onPadEvent(int index, PadEvents events, GamepadPtr gamepad) {
@@ -65,13 +65,13 @@ void onPadEvent(int index, PadEvents events, GamepadPtr gamepad) {
         rightTrack.backward();
         delay(20);
 
-        dfmp3.playMp3FolderTrack(TRACK_CANNON);
+        playCannon();
 
         leftTrack.stop();
         rightTrack.stop();
     }
     if (events.keyupB) {
-        dfmp3.playMp3FolderTrack(TRACK_GATLING);
+        playGatling();
     }
 
     // Cannon Up/Down
@@ -139,13 +139,12 @@ void onPadEvent(int index, PadEvents events, GamepadPtr gamepad) {
 }
 
 void onPadConnected(GamepadPtr gp) {
-    dfmp3.playMp3FolderTrack(TRACK_RESET);
+    playReset();
 }
 
-void onPadDisonnected(GamepadPtr gp) {
-    dfmp3.setVolume(DEFAULT_VOLUME);
-
-    dfmp3.loopGlobalTrack(4);
+void onPadDisconnected(GamepadPtr gp) {
+    setDefaultVolume();
+    playWait();
 }
 
 // Arduino setup function. Runs in CPU 1
@@ -155,7 +154,7 @@ void setup() {
     Console.printf("BD Addr: %2X:%2X:%2X:%2X:%2X:%2X\n", addr[0], addr[1], addr[2], addr[3], addr[4], addr[5]);
 
     // Setup the Bluepad32 callbacks
-    pad32.setup(onPadEvent, onPadConnected, onPadDisonnected);
+    pad32.setup(onPadEvent, onPadConnected, onPadDisconnected);
 
     // "forgetBluetoothKeys()" should be called when the user performs
     // a "device factory reset", or similar.
@@ -179,8 +178,8 @@ void setup() {
     setupSound();
     delay(1000);
 
-    playOpening();
-    delay(4000);
+    playWait();
+    //    delay(4000);
 }
 
 // Arduino loop function. Runs in CPU 1.

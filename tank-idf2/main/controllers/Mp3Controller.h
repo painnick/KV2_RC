@@ -10,7 +10,7 @@
 
 int BACKGROUND_TRACK = -1;
 
-void playBackground();
+void playWait();
 
 class Mp3Notify;
 
@@ -89,7 +89,7 @@ class Mp3Notify {
         ESP_LOGD(MP3_TAG, "Play finished for #%d", track);
 #endif
         if (track == BACKGROUND_TRACK) {
-            // playBackground();
+             playWait();
         }
     }
 
@@ -120,25 +120,26 @@ inline void setupSound() {
     ESP_LOGI(MP3_TAG, "Setup DFPlayer");
 }
 
-inline void playOpening() {
+inline void playWait() {
     dfmp3.playMp3FolderTrack(1);
-    dfmp3.loop();
-}
-
-inline void playGo() {
-    dfmp3.playMp3FolderTrack(2);
+//    dfmp3.loopGlobalTrack(4);
     dfmp3.loop();
 
     BACKGROUND_TRACK = dfmp3.getCurrentTrack();
 }
 
-inline void playYareYare() {
-    dfmp3.playMp3FolderTrack(3);
+inline void playReset() {
+    dfmp3.playMp3FolderTrack(TRACK_RESET);
+    dfmp3.loop();
+}
+
+inline void playCannon() {
+    dfmp3.playMp3FolderTrack(TRACK_CANNON);
     dfmp3.loop();
 }
 
 inline void playGatling() {
-    dfmp3.playAdvertisement(1);
+    dfmp3.playAdvertisement(TRACK_GATLING);
     dfmp3.loop();
 }
 
