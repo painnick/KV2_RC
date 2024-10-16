@@ -121,7 +121,7 @@ inline void setupSound() {
 }
 
 inline void playWait() {
-    dfmp3.playMp3FolderTrack(1);
+    dfmp3.playMp3FolderTrack(TRACK_WAIT);
 //    dfmp3.loopGlobalTrack(4);
     dfmp3.loop();
 
