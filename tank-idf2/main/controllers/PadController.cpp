@@ -23,8 +23,8 @@ void onConnectedGamepad(GamepadPtr gp) {
             // Additionally, you can get certain gamepad properties like:
             // Model, VID, PID, BTAddr, flags, etc.
             GamepadProperties properties = gp->getProperties();
-            Console.printf("Gamepad model: %s, VID=0x%04x, PID=0x%04x\n", gp->getModelName(), properties.vendor_id,
-                           properties.product_id);
+            Console.printf("Gamepad model: %s, VID=0x%04x, PID=0x%04x\n", gp->getModelName().c_str(),
+                           properties.vendor_id, properties.product_id);
             myGamepads[i] = gp;
             foundEmptySlot = true;
 
@@ -73,10 +73,9 @@ PadController::PadController(Bluepad32* bp32) {
     this->bp32_ = bp32;
 }
 
-void PadController::setup(
-    const GamepadEventCallback e,
-    const GamepadConnectedEventCallback onConnected,
-    const GamepadDisconnectedEventCallback onDisconnected) {
+void PadController::setup(const GamepadEventCallback& e,
+                          const GamepadConnectedEventCallback& onConnected,
+                          const GamepadDisconnectedEventCallback& onDisconnected) {
     this->bp32_->setup(onConnectedGamepad, onDisconnectedGamepad);
     this->onEvent = e;
 
@@ -85,9 +84,12 @@ void PadController::setup(
 }
 
 void PadController::loop() {
+    bool dataUpdated = false;
     if (this->bp32_ != nullptr) {
-        this->bp32_->update();
+        dataUpdated = this->bp32_->update();
     }
+    if (!dataUpdated)
+        return;
 
     // It is safe to always do this before using the gamepad API.
     // This guarantees that the gamepad is valid and connected.

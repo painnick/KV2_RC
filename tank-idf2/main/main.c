@@ -4,6 +4,9 @@
 
 #include "sdkconfig.h"
 
+#include "soc/rtc_cntl_reg.h"  // disable brownout problems
+#include "soc/soc.h"           // disable brownout problems
+
 #include <stddef.h>
 
 // BTstack related
@@ -24,6 +27,8 @@ void initBluepad32() {
 int app_main(void) {
 #endif  // !CONFIG_AUTOSTART_ARDUINO
     // hci_dump_open(NULL, HCI_DUMP_STDOUT);
+
+    WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);  // disable brownout detector
 
 // Don't use BTstack buffered UART. It conflicts with the console.
 #ifndef CONFIG_ESP_CONSOLE_UART_NONE

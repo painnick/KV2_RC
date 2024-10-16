@@ -5,6 +5,8 @@
 #ifndef TANK_IDF_TRACKCONTROLLER_H
 #define TANK_IDF_TRACKCONTROLLER_H
 
+#include "../common.h"
+
 /**
  * LEDC Chan to Group/Channel/Timer Mapping
  * ledc: 0  => Group: 0, Channel: 0, Timer: 0

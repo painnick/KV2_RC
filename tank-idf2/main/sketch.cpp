@@ -1,12 +1,3 @@
-// SPDX-License-Identifier: Apache-2.0
-// Copyright 2021 Ricardo Quesada
-// http://retro.moe/unijoysticle2
-
-#include "sdkconfig.h"
-
-#include <Arduino.h>
-#include <Bluepad32.h>
-
 //
 // README FIRST, README FIRST, README FIRST
 //
@@ -21,45 +12,142 @@
 // from "sdkconfig.defaults" with:
 //    CONFIG_BLUEPAD32_USB_CONSOLE_ENABLE=n
 
-ControllerPtr myControllers[BP32_MAX_GAMEPADS];
+#include "sdkconfig.h"
 
-// This callback gets called any time a new gamepad is connected.
-// Up to 4 gamepads can be connected at the same time.
-void onConnectedController(ControllerPtr ctl) {
-    bool foundEmptySlot = false;
-    for (int i = 0; i < BP32_MAX_GAMEPADS; i++) {
-        if (myControllers[i] == nullptr) {
-            Console.printf("CALLBACK: Controller is connected, index=%d\n", i);
-            // Additionally, you can get certain gamepad properties like:
-            // Model, VID, PID, BTAddr, flags, etc.
-            ControllerProperties properties = ctl->getProperties();
-            Console.printf("Controller model: %s, VID=0x%04x, PID=0x%04x\n", ctl->getModelName(), properties.vendor_id,
-                           properties.product_id);
-            myControllers[i] = ctl;
-            foundEmptySlot = true;
-            break;
-        }
+#include <Arduino.h>
+#include <Bluepad32.h>
+#include <ESP32Servo.h>
+
+#include "./common.h"
+
+#include "./controllers/Mp3Notify.h"
+#include "./libs/DFMiniMp3.h"
+
+#include "./controllers/CannonController.h"
+#include "./controllers/PadController.h"
+#include "./controllers/TrackController.h"
+#include "./controllers/TurretController.h"
+
+#define MAIN_TAG "Main"
+
+PadController pad32(&BP32);
+
+Servo servoTurret;
+TurretController turretController(&servoTurret, PIN_TURRET_SERVO);
+
+Servo servoCannon;
+CannonController cannonController(&servoCannon, PIN_CANNON_SERVO, 900, 2100);
+
+TrackController leftTrack(PIN_TRACK_L1_MOTOR, PIN_TRACK_L2_MOTOR, CHANNEL_L1, CHANNEL_L2);
+TrackController rightTrack(PIN_TRACK_R1_MOTOR, PIN_TRACK_R2_MOTOR, CHANNEL_R1, CHANNEL_R2);
+
+DfMp3 dfmp3(Serial1, PIN_MP3_RX, PIN_MP3_TX);
+bool headLightOn = false;
+
+void onReset() {
+    ESP_LOGI(MAIN_TAG, "Reset");
+
+    turretController.init();
+    cannonController.init();
+
+    leftTrack.stop();
+    rightTrack.stop();
+
+    dfmp3.playMp3FolderTrack(TRACK_RESET);
+}
+
+void onPadEvent(int index, PadEvents events, GamepadPtr gamepad) {
+    // Cannon Fire
+    if (events.keyupA) {
+        digitalWrite(PIN_CANNON_LIGHT, HIGH);
+        delay(100);
+        digitalWrite(PIN_CANNON_LIGHT, LOW);
+
+        leftTrack.backward();
+        rightTrack.backward();
+        delay(20);
+
+        dfmp3.playMp3FolderTrack(TRACK_CANNON);
+
+        leftTrack.stop();
+        rightTrack.stop();
     }
-    if (!foundEmptySlot) {
-        Console.println("CALLBACK: Controller connected, but could not found empty slot");
+    if (events.keyupB) {
+        dfmp3.playMp3FolderTrack(TRACK_GATLING);
+    }
+
+    // Cannon Up/Down
+    if (events.keyupUp) {
+        cannonController.turnUp();
+    }
+    if (events.keyupDown) {
+        cannonController.turnDown();
+    }
+
+    // Turret Left/Right
+    if (events.keyupLeft) {
+        turretController.turnLeft();
+    }
+    if (events.keyupRight) {
+        turretController.turnRight();
+    }
+
+    // HeadLight
+    if (events.keyupSelect) {
+        headLightOn = !headLightOn;
+        digitalWrite(PIN_HEAD_LIGHT, headLightOn ? HIGH : LOW);
+    }
+
+    // Reset
+    if (events.keyupStart) {
+        onReset();
+    }
+
+    // Volume
+    if (events.keyupL1) {
+        dfmp3.increaseVolume();
+    }
+    if (events.keyupL2) {
+        dfmp3.decreaseVolume();
+    }
+
+    // Speed
+    if (events.keyupR1) {
+        leftTrack.speedUp();
+        rightTrack.speedUp();
+    }
+    if (events.keyupR2) {
+        leftTrack.speedDown();
+        rightTrack.speedDown();
+    }
+
+    int32_t Ly = gamepad->axisY();
+    if (Ly > 50) {
+        leftTrack.backward();
+    } else if (Ly < -50) {
+        leftTrack.forward();
+    } else {
+        leftTrack.stop();
+    }
+
+    int32_t Ry = gamepad->axisRY();
+    if (Ry > 50) {
+        rightTrack.backward();
+    } else if (Ry < -50) {
+        rightTrack.forward();
+    } else {
+        rightTrack.stop();
     }
 }
 
-void onDisconnectedController(ControllerPtr ctl) {
-    bool foundController = false;
+void onPadConnected(GamepadPtr gp) {
+    dfmp3.playMp3FolderTrack(TRACK_RESET);
+}
 
-    for (int i = 0; i < BP32_MAX_GAMEPADS; i++) {
-        if (myControllers[i] == ctl) {
-            Console.printf("CALLBACK: Controller disconnected from index=%d\n", i);
-            myControllers[i] = nullptr;
-            foundController = true;
-            break;
-        }
-    }
+void onPadDisonnected(GamepadPtr gp) {
+    dfmp3.setVolume(DEFAULT_VOLUME);
 
-    if (!foundController) {
-        Console.println("CALLBACK: Controller disconnected, but not found in myControllers");
-    }
+    dfmp3.loopGlobalTrack(4);
 }
 
 void dumpGamepad(ControllerPtr ctl) {
@@ -82,67 +170,6 @@ void dumpGamepad(ControllerPtr ctl) {
         ctl->accelX(),       // Accelerometer X
         ctl->accelY(),       // Accelerometer Y
         ctl->accelZ()        // Accelerometer Z
-    );
-}
-
-void dumpMouse(ControllerPtr ctl) {
-    Console.printf("idx=%d, buttons: 0x%04x, scrollWheel=0x%04x, delta X: %4d, delta Y: %4d\n",
-                   ctl->index(),        // Controller Index
-                   ctl->buttons(),      // bitmask of pressed buttons
-                   ctl->scrollWheel(),  // Scroll Wheel
-                   ctl->deltaX(),       // (-511 - 512) left X Axis
-                   ctl->deltaY()        // (-511 - 512) left Y axis
-    );
-}
-
-void dumpKeyboard(ControllerPtr ctl) {
-    static const char* key_names[] = {
-        // clang-format off
-        // To avoid having too much noise in this file, only a few keys are mapped to strings.
-        // Starts with "A", which is offset 4.
-        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V",
-        "W", "X", "Y", "Z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
-        // Special keys
-        "Enter", "Escape", "Backspace", "Tab", "Spacebar", "Underscore", "Equal", "OpenBracket", "CloseBracket",
-        "Backslash", "Tilde", "SemiColon", "Quote", "GraveAccent", "Comma", "Dot", "Slash", "CapsLock",
-        // Function keys
-        "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",
-        // Cursors and others
-        "PrintScreen", "ScrollLock", "Pause", "Insert", "Home", "PageUp", "Delete", "End", "PageDown",
-        "RightArrow", "LeftArrow", "DownArrow", "UpArrow",
-        // clang-format on
-    };
-    static const char* modifier_names[] = {
-        // clang-format off
-        // From 0xe0 to 0xe7
-        "Left Control", "Left Shift", "Left Alt", "Left Meta",
-        "Right Control", "Right Shift", "Right Alt", "Right Meta",
-        // clang-format on
-    };
-    Console.printf("idx=%d, Pressed keys: ", ctl->index());
-    for (int key = Keyboard_A; key <= Keyboard_UpArrow; key++) {
-        if (ctl->isKeyPressed(static_cast<KeyboardKey>(key))) {
-            const char* keyName = key_names[key-4];
-            Console.printf("%s,", keyName);
-       }
-    }
-    for (int key = Keyboard_LeftControl; key <= Keyboard_RightMeta; key++) {
-        if (ctl->isKeyPressed(static_cast<KeyboardKey>(key))) {
-            const char* keyName = modifier_names[key-0xe0];
-            Console.printf("%s,", keyName);
-        }
-    }
-    Console.printf("\n");
-}
-
-void dumpBalanceBoard(ControllerPtr ctl) {
-    Console.printf("idx=%d,  TL=%u, TR=%u, BL=%u, BR=%u, temperature=%d\n",
-                   ctl->index(),        // Controller Index
-                   ctl->topLeft(),      // top-left scale
-                   ctl->topRight(),     // top-right scale
-                   ctl->bottomLeft(),   // bottom-left scale
-                   ctl->bottomRight(),  // bottom-right scale
-                   ctl->temperature()   // temperature: used to adjust the scale value's precision
     );
 }
 
@@ -198,75 +225,6 @@ void processGamepad(ControllerPtr ctl) {
     // See ArduinoController.h for all the available functions.
 }
 
-void processMouse(ControllerPtr ctl) {
-    // This is just an example.
-    if (ctl->scrollWheel() > 0) {
-        // Do Something
-    } else if (ctl->scrollWheel() < 0) {
-        // Do something else
-    }
-
-    // See "dumpMouse" for possible things to query.
-    dumpMouse(ctl);
-}
-
-void processKeyboard(ControllerPtr ctl) {
-
-    if (!ctl->isAnyKeyPressed())
-        return;
-
-    // This is just an example.
-    if (ctl->isKeyPressed(Keyboard_A)) {
-        // Do Something
-        Console.println("Key 'A' pressed");
-    }
-
-    // Don't do "else" here.
-    // Multiple keys can be pressed at the same time.
-    if (ctl->isKeyPressed(Keyboard_LeftShift)) {
-        // Do something else
-        Console.println("Key 'LEFT SHIFT' pressed");
-    }
-
-    // Don't do "else" here.
-    // Multiple keys can be pressed at the same time.
-    if (ctl->isKeyPressed(Keyboard_LeftArrow)) {
-        // Do something else
-        Console.println("Key 'Left Arrow' pressed");
-    }
-
-    // See "dumpKeyboard" for possible things to query.
-    dumpKeyboard(ctl);
-}
-
-void processBalanceBoard(ControllerPtr ctl) {
-    // This is just an example.
-    if (ctl->topLeft() > 10000) {
-        // Do Something
-    }
-
-    // See "dumpBalanceBoard" for possible things to query.
-    dumpBalanceBoard(ctl);
-}
-
-void processControllers() {
-    for (auto myController : myControllers) {
-        if (myController && myController->isConnected() && myController->hasData()) {
-            if (myController->isGamepad()) {
-                processGamepad(myController);
-            } else if (myController->isMouse()) {
-                processMouse(myController);
-            } else if (myController->isKeyboard()) {
-                processKeyboard(myController);
-            } else if (myController->isBalanceBoard()) {
-                processBalanceBoard(myController);
-            } else {
-                Console.printf("Unsupported controller\n");
-            }
-        }
-    }
-}
-
 // Arduino setup function. Runs in CPU 1
 void setup() {
     Console.printf("Firmware: %s\n", BP32.firmwareVersion());
@@ -274,7 +232,7 @@ void setup() {
     Console.printf("BD Addr: %2X:%2X:%2X:%2X:%2X:%2X\n", addr[0], addr[1], addr[2], addr[3], addr[4], addr[5]);
 
     // Setup the Bluepad32 callbacks
-    BP32.setup(&onConnectedController, &onDisconnectedController);
+    pad32.setup(onPadEvent, onPadConnected, onPadDisonnected);
 
     // "forgetBluetoothKeys()" should be called when the user performs
     // a "device factory reset", or similar.
@@ -300,9 +258,7 @@ void setup() {
 void loop() {
     // This call fetches all the controllers' data.
     // Call this function in your main loop.
-    bool dataUpdated = BP32.update();
-    if (dataUpdated)
-        processControllers();
+    pad32.loop();
 
     // The main loop must have some kind of "yield to lower priority task" event.
     // Otherwise, the watchdog will get triggered.
@@ -312,4 +268,5 @@ void loop() {
 
     //     vTaskDelay(1);
     delay(150);
+    dfmp3.loop();
 }

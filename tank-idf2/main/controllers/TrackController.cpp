@@ -5,9 +5,6 @@
 #include <Arduino.h>
 #include "TrackController.h"
 
-// 0~255
-#define TRACK_MOTOR_RESOLUTION 8
-
 TrackController::TrackController(int pin1, int pin2, int ledc1, int ledc2) : ledc1(ledc1), ledc2(ledc2), speed(256 - 1) {
     ledcSetup(ledc1, 1000, TRACK_MOTOR_RESOLUTION);
     ledcSetup(ledc2, 1000, TRACK_MOTOR_RESOLUTION);
