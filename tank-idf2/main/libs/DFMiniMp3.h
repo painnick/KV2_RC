@@ -382,7 +382,7 @@ class DFMiniMp3 {
 
         _lastSendSpace = sendSpaceNeeded;
 
-#ifdef _DEBUG
+#ifdef DEBUG
         Serial.print("==>");
         Serial.print(" (STR)");
         Serial.print(packet.startCode, HEX);
@@ -455,7 +455,7 @@ class DFMiniMp3 {
             return false;
         }
 
-#ifdef _DEBUG
+#ifdef DEBUG
         Serial.print(F("<== (CMD)"));
         Serial.print(in.command, HEX);
         Serial.print(F(" (PAR1)"));
