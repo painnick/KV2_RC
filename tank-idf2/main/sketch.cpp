@@ -27,8 +27,6 @@
 #include "./controllers/TrackController.h"
 #include "./controllers/TurretController.h"
 
-#define MAIN_TAG "Main"
-
 PadController pad32(&BP32);
 
 Servo servoTurret;
@@ -43,8 +41,6 @@ TrackController rightTrack(PIN_TRACK_R1_MOTOR, PIN_TRACK_R2_MOTOR, CHANNEL_R1, C
 bool headLightOn = false;
 
 void onReset() {
-    ESP_LOGI(MAIN_TAG, "Reset");
-
     turretController.init();
     cannonController.init();
 
