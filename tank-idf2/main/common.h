@@ -14,10 +14,10 @@
 #define PIN_CANNON_SERVO 21  // PWM(Servo)
 #define PIN_TURRET_SERVO 22  // PWM(Servo)
 
-#define PIN_TRACK_L1_MOTOR 23  // PWM(Analog)
-#define PIN_TRACK_L2_MOTOR 19  // PWM(Analog)
-#define PIN_TRACK_R1_MOTOR 26  // PWM(Analog)
-#define PIN_TRACK_R2_MOTOR 18  // PWM(Analog)
+#define PIN_TRACK_L1_MOTOR 18  // PWM(Analog)
+#define PIN_TRACK_L2_MOTOR 26  // PWM(Analog)
+#define PIN_TRACK_R1_MOTOR 19  // PWM(Analog)
+#define PIN_TRACK_R2_MOTOR 23  // PWM(Analog)
 
 #define PIN_CANNON_LIGHT 27
 #define PIN_HEAD_LIGHT 25
