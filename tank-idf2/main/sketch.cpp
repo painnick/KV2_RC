@@ -178,6 +178,9 @@ void setup() {
     setupSound();
     delay(1000);
 
+    pinMode(PIN_CANNON_LIGHT, OUTPUT);
+    pinMode(PIN_HEAD_LIGHT, OUTPUT);
+
     playWait();
     //    delay(4000);
 }
