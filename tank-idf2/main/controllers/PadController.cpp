@@ -5,6 +5,7 @@
 #include <Arduino.h>
 
 #include "PadController.h"
+#include "common.h"
 
 GamepadPtr myGamepads[BP32_MAX_GAMEPADS];
 
@@ -99,12 +100,14 @@ void PadController::loop() {
         memset(&events, 0, sizeof(PadEvents));
 
         if (myGamepad && myGamepad->isConnected()) {
+            bool modified = false;
             if (lastPadStates[i].dpad != myGamepad->dpad()) {
                 events.keyupUp = ((lastPadStates[i].dpad & 0x01) == 0) && ((myGamepad->dpad() & 0x01) > 0);
                 events.keyupDown = ((lastPadStates[i].dpad & 0x02) == 0) && ((myGamepad->dpad() & 0x02) > 0);
                 events.keyupRight = ((lastPadStates[i].dpad & 0x04) == 0) && ((myGamepad->dpad() & 0x04) > 0);
                 events.keyupLeft = ((lastPadStates[i].dpad & 0x08) == 0) && ((myGamepad->dpad() & 0x08) > 0);
                 lastPadStates[i].dpad = myGamepad->dpad();
+                modified = true;
             }
 
             if (lastPadStates[i].buttons != myGamepad->buttons()) {
@@ -117,26 +120,37 @@ void PadController::loop() {
                 events.keyupL2 = ((lastPadStates[i].buttons & 0x40) == 0) && ((myGamepad->buttons() & 0x40) > 0);
                 events.keyupR2 = ((lastPadStates[i].buttons & 0x80) == 0) && ((myGamepad->buttons() & 0x80) > 0);
                 lastPadStates[i].buttons = myGamepad->buttons();
+                modified = true;
             }
 
-            if (lastPadStates[i].axis_x != myGamepad->axisX()) {
+            int32_t newAxisX = myGamepad->axisX();
+            if ((STICK_THRESHOLD_MIN < newAxisX) && (newAxisX < STICK_THRESHOLD_MAX))
+                newAxisX = 0;
+            if (lastPadStates[i].axis_x != newAxisX) {
                 events.changedAxisLx = true;
-                lastPadStates[i].axis_x = myGamepad->axisX();
+                lastPadStates[i].axis_x = newAxisX;
+                modified = true;
             }
 
-            if (lastPadStates[i].axis_y != myGamepad->axisY()) {
+            int32_t newAxisY = myGamepad->axisY();
+            if ((STICK_THRESHOLD_MIN < newAxisY) && (newAxisY < STICK_THRESHOLD_MAX))
+                newAxisY = 0;
+            if (lastPadStates[i].axis_y != newAxisY) {
                 events.changedAxisLy = true;
-                lastPadStates[i].axis_y = myGamepad->axisY();
+                lastPadStates[i].axis_y = newAxisY;
+                modified = true;
             }
 
             if (lastPadStates[i].axis_rx != myGamepad->axisRX()) {
                 events.changedAxisRx = true;
                 lastPadStates[i].axis_rx = myGamepad->axisRX();
+                modified = true;
             }
 
             if (lastPadStates[i].axis_ry != myGamepad->axisRY()) {
                 events.changedAxisRy = true;
                 lastPadStates[i].axis_ry = myGamepad->axisRY();
+                modified = true;
             }
 
             if (lastPadStates[i].misc_buttons != myGamepad->miscButtons()) {
@@ -145,9 +159,13 @@ void PadController::loop() {
                 events.keyupStart =
                     ((lastPadStates[i].misc_buttons & 0x04) == 0) && ((myGamepad->miscButtons() & 0x04) > 0);
                 lastPadStates[i].misc_buttons = myGamepad->miscButtons();
+                modified = true;
             }
 
-            this->onEvent(i, events, myGamepad);
+            if (modified) {
+                this->onEvent(i, events, myGamepad);
+                Console.println("modified");
+            }
         }
     }
 }
