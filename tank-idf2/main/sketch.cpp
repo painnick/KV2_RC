@@ -57,6 +57,8 @@ void onReset() {
 void onPadEvent(int index, PadEvents events, GamepadPtr gamepad) {
     // Cannon Fire
     if (events.keyupA) {
+        playCannon();
+
         digitalWrite(PIN_CANNON_LIGHT, HIGH);
         delay(100);
         digitalWrite(PIN_CANNON_LIGHT, LOW);
@@ -64,8 +66,6 @@ void onPadEvent(int index, PadEvents events, GamepadPtr gamepad) {
         leftTrack.backward();
         rightTrack.backward();
         delay(20);
-
-        playCannon();
 
         leftTrack.stop();
         rightTrack.stop();
@@ -182,7 +182,6 @@ void setup() {
     pinMode(PIN_HEAD_LIGHT, OUTPUT);
 
     playWait();
-    //    delay(4000);
 }
 
 // Arduino loop function. Runs in CPU 1.
