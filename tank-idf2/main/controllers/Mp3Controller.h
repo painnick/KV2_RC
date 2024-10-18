@@ -139,11 +139,6 @@ inline void playCannon() {
 }
 
 inline void playGatling() {
-    dfmp3.playAdvertisement(TRACK_GATLING);
-    dfmp3.loop();
-}
-
-inline void stopGatling() {
-    dfmp3.stopAdvertisement();
+    dfmp3.playMp3FolderTrack(TRACK_GATLING);
     dfmp3.loop();
 }
