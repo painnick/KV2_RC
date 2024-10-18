@@ -30,9 +30,9 @@
 class TrackController {
    public:
     TrackController(int pin1, int pin2, int ledc1, int ledc2);
-    void forward();
-    void backward();
-    void stop();
+    void forward() const;
+    void backward() const;
+    void stop() const;
     void setSpeed(int speed);
     int speedUp(int step = 32);
     int speedDown(int step = 32);

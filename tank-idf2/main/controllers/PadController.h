@@ -38,7 +38,7 @@ typedef std::function<void(GamepadPtr gamepad)> GamepadDisconnectedEventCallback
 
 class PadController : Bluepad32 {
    public:
-    PadController(Bluepad32* bp32);
+    explicit PadController(Bluepad32* bp32);
     void setup(const GamepadEventCallback& onEvent, const GamepadConnectedEventCallback& onConnected, const GamepadDisconnectedEventCallback& onDisconnected);
     void loop();
 

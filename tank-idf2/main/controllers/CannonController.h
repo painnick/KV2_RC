@@ -15,7 +15,7 @@ class CannonController {
     int turnDown(int angle = 5);
 
    protected:
-    Servo* servo = NULL;
+    Servo* servo = nullptr;
     int currentAngle;
     int maxUp, maxDown;
 

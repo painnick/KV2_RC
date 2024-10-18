@@ -15,7 +15,7 @@ class TurretController {
     int turnRight(int angle = 5);
 
    protected:
-    Servo* servo = NULL;
+    Servo* servo = nullptr;
     int currentAngle;
     int maxLeft, maxRight;
 

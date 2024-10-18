@@ -13,17 +13,17 @@ TrackController::TrackController(int pin1, int pin2, int ledc1, int ledc2) : led
     ledcAttachPin(pin2, ledc2);
 }
 
-void TrackController::forward() {
+void TrackController::forward() const {
     ledcWrite(ledc1, speed);
     ledcWrite(ledc2, 0);
 }
 
-void TrackController::backward() {
+void TrackController::backward() const {
     ledcWrite(ledc1, 0);
     ledcWrite(ledc2, speed);
 }
 
-void TrackController::stop() {
+void TrackController::stop() const {
     ledcWrite(ledc1, 0);
     ledcWrite(ledc2, 0);
 }
