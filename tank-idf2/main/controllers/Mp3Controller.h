@@ -111,9 +111,6 @@ inline void setDefaultVolume() {
 inline void setupSound() {
     dfmp3.begin(9600, 1000);
     delay(1000);
-    //  while (!dfSerial.available()) {
-    //    delay(1);
-    //  }
 
     setDefaultVolume();
 
@@ -122,7 +119,6 @@ inline void setupSound() {
 
 inline void playWait() {
     dfmp3.playMp3FolderTrack(TRACK_WAIT);
-//    dfmp3.loopGlobalTrack(4);
     dfmp3.loop();
 
     BACKGROUND_TRACK = dfmp3.getCurrentTrack();
