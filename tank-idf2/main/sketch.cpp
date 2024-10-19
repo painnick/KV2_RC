@@ -178,6 +178,8 @@ void setup() {
     pinMode(PIN_HEAD_LIGHT, OUTPUT);
 
     playWait();
+
+    leftTrack.speedUp(64);
 }
 
 // Arduino loop function. Runs in CPU 1.
