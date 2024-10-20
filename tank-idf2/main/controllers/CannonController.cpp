@@ -7,7 +7,7 @@
 
 CannonController::CannonController(Servo* servo1, int pinNo1, int minPulseWidth, int maxPulseWidth)
     : servo(servo1),
-      currentAngle(5),
+      currentAngle(0),
       maxUp(20),
       maxDown(0) {
     this->servo->attach(pinNo1, minPulseWidth, maxPulseWidth);
