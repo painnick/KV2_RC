@@ -5,16 +5,20 @@
 #include "CannonController.h"
 #include <Arduino.h>
 
+#define DEFAULT_DEGREE (-10)
+#define MAX_DEGREE (5)
+#define MIN_DEGREE (-30)
+
 CannonController::CannonController(Servo* servo1, int pinNo1, int minPulseWidth, int maxPulseWidth)
     : servo(servo1),
-      currentAngle(0),
-      maxUp(20),
-      maxDown(0) {
+      currentAngle(DEFAULT_DEGREE),
+      maxUp(MAX_DEGREE),
+      maxDown(MIN_DEGREE) {
     this->servo->attach(pinNo1, minPulseWidth, maxPulseWidth);
 }
 
 void CannonController::init() {
-    this->currentAngle = 0;
+    this->currentAngle = DEFAULT_DEGREE;
     this->turn(this->currentAngle);
 }
 
